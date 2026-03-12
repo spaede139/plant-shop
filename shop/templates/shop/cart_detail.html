@@ -1,0 +1,42 @@
+> spaede:
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Корзина</title>
+</head>
+<body>
+    <h1>Корзина</h1>
+
+    {% if items %}
+        <table border="1" cellpadding="5">
+            <tr>
+                <th>Товар</th>
+                <th>Цена</th>
+                <th>Количество</th>
+                <th>Стоимость</th>
+                <th>Действие</th>
+            </tr>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.product.price }} руб.</td>
+                <td>
+                    <form method="post" action="/cart/update/{{ item.id }}/">
+                        {% csrf_token %}
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="0" max="{{ item.product.stock }}">
+                        <button type="submit">Обновить</button>
+                    </form>
+                </td>
+                <td>{{ item.item_price }} руб.</td>
+                <td><a href="/cart/remove/{{ item.id }}/">Удалить</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        
+        <h3>Итого: {{ cart.total_price }} руб.</h3>
+    {% else %}
+        <p>Корзина пуста</p>
+        <a href="/catalog/">Перейти в каталог</a>
+    {% endif %}
+</body>
+</html>

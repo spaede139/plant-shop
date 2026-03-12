@@ -1,0 +1,22 @@
+> spaede:
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ product.name }}</title>
+</head>
+<body>
+    <h1>{{ product.name }}</h1>
+
+    <p><strong>Цена:</strong> {{ product.price }} руб.</p>
+    <p><strong>В наличии:</strong> {{ product.stock }} шт.</p>
+    <p><strong>Категория:</strong> {{ product.category.name }}</p>
+    <p><strong>Производитель:</strong> {{ product.manufacturer.name }}</p>
+    <p><strong>Описание:</strong></p>
+    <p>{{ product.description }}</p>
+
+    <a href="/cart/add/{{ product.id }}/">Добавить в корзину</a>
+    <br>
+    <a href="/catalog/">← Назад в каталог</a>
+</body>
+</html>
+

@@ -28,7 +28,7 @@ def about_author(request):
     """)
 
 
-def product_list(request):
+def catalog(request):
     products = Product.objects.all()
     
 
@@ -58,15 +58,17 @@ def product_detail(request, pk):
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     cart, _ = Cart.objects.get_or_create(user=request.user)
-    
-    item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-    
+    item, created = CartItem.objects.get_or_create(
+        cart=cart, 
+        product=product,
+        defaults={'quantity': 1}  
+    )
+
     if not created and item.quantity < product.stock:
         item.quantity += 1
         item.save()
-    
-    return redirect('cart_detail')
 
+    return redirect('cart_detail')
 
 @login_required
 def update_cart_item(request, item_id):
