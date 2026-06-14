@@ -8,7 +8,14 @@ from django.contrib import messages
 from .models import Product, Category, Manufacturer, Cart, CartItem, Order, OrderItem
 import io
 import openpyxl
-
+from rest_framework import viewsets, permissions
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from .models import Product, Category, Manufacturer, Cart, CartItem
+from .serializers import (
+    ProductSerializer, CategorySerializer, ManufacturerSerializer,
+    CartSerializer, CartItemSerializer
+)
 
 
 def generate_excel_receipt(order):
@@ -230,3 +237,35 @@ def checkout(request):
         return redirect('catalog')
     
     return render(request, 'shop/checkout.html', {'items': items, 'cart': cart})
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class ManufacturerViewSet(viewsets.ModelViewSet):
+    queryset = Manufacturer.objects.all()
+    serializer_class = ManufacturerSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class CartViewSet(viewsets.ModelViewSet):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+
+        return Cart.objects.filter(user=self.request.user)
+
+class CartItemViewSet(viewsets.ModelViewSet):
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+
+        return CartItem.objects.filter(cart__user=self.request.user)
