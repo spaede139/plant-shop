@@ -1,39 +1,81 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ product.name }}</title>
-</head>
-<body>
-    <div style="background-color: #f0f0f0; padding: 10px; margin-bottom: 20px;">
-        <a href="/">Главная</a> |
-        <a href="/catalog/">Каталог</a> |
-        <a href="/cart/">Корзина</a>
-        
-        <span style="float: right;">
-            {% if user.is_authenticated %}
-                {{ user.username }} | 
-                <form method="post" action="/accounts/logout/" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" style="background: none; border: none; color: blue; cursor: pointer; text-decoration: underline;">Сменить пользователя</button>
-                </form>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'catalog' %}">Каталог</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+ 
+    <div class="col-md-6">
+        <div class="card">
+            {% if product.photo %}
+                <img src="{{ product.photo.url }}" class="card-img-top" alt="{{ product.name }}" style="max-height: 400px; object-fit: contain;">
             {% else %}
-                <a href="/accounts/login/">Войти</a> | 
-                <a href="/admin/auth/user/add/">Регистрация</a>
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-leaf fa-5x text-success"></i>
+                    <p class="mt-2 text-muted">Нет фото</p>
+                </div>
             {% endif %}
-        </span>
+        </div>
     </div>
+    
+   
+    <div class="col-md-6">
+        <h1 class="mb-3">{{ product.name }}</h1>
+        
+       
+        <p class="text-muted mb-2">
+            <i class="fas fa-building"></i> Производитель: {{ product.manufacturer.name }}
+        </p>
+        
+  
+        <p class="text-muted mb-2">
+            <i class="fas fa-tag"></i> Категория: {{ product.category.name }}
+        </p>
+        
+       
+        <h2 class="text-success mb-3">{{ product.price }} руб.</h2>
+        
 
-    <h1>{{ product.name }}</h1>
-
-    <p><strong>Цена:</strong> {{ product.price }} руб.</p>
-    <p><strong>В наличии:</strong> {{ product.stock }} шт.</p>
-    <p><strong>Категория:</strong> {{ product.category.name }}</p>
-    <p><strong>Производитель:</strong> {{ product.manufacturer.name }}</p>
-    <p><strong>Описание:</strong></p>
-    <p>{{ product.description }}</p>
-
-    <a href="/cart/add/{{ product.id }}/">Добавить в корзину</a>
-    <br>
-    <a href="/catalog/">← Назад в каталог</a>
-</body>
-</html>
+        {% if product.stock > 0 %}
+            <p class="text-success">
+                <i class="fas fa-check-circle"></i> В наличии: {{ product.stock }} шт.
+            </p>
+        {% else %}
+            <p class="text-danger">
+                <i class="fas fa-times-circle"></i> Нет в наличии
+            </p>
+        {% endif %}
+        
+       
+        <div class="card bg-light p-3 mb-4">
+            <h5>Описание</h5>
+            <p>{{ product.description }}</p>
+        </div>
+       
+        {% if product.stock > 0 %}
+            <a href="{% url 'add_to_cart' product.id %}" class="btn btn-success btn-lg w-100">
+                <i class="fas fa-shopping-cart"></i> Добавить в корзину
+            </a>
+        {% else %}
+            <button class="btn btn-secondary btn-lg w-100" disabled>
+                <i class="fas fa-times"></i> Нет в наличии
+            </button>
+        {% endif %}
+        
+     
+        <a href="{% url 'catalog' %}" class="btn btn-outline-secondary w-100 mt-3">
+            ← Вернуться в каталог
+        </a>
+    </div>
+</div>
+{% endblock %}

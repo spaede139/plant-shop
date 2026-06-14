@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Каталог товаров{% endblock %}
+
+{% block content %}
+<div class="row">
+
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Фильтры</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" id="filter-form">
+       
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Категория</label>
+                        <select name="category" class="form-select">
+                            <option value="">Все категории</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ cat.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Производитель</label>
+                        <select name="manufacturer" class="form-select">
+                            <option value="">Все производители</option>
+                            {% for man in manufacturers %}
+                                <option value="{{ man.id }}" {% if selected_manufacturer == man.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ man.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Поиск -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Поиск</label>
+                        <input type="text" name="search" class="form-control" placeholder="Название товара..." value="{{ search_query }}">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success w-100">Применить фильтры</button>
+                    <a href="{% url 'catalog' %}" class="btn btn-outline-secondary w-100 mt-2">Сбросить</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Товары</h2>
+            <p class="text-muted mb-0">Найдено: {{ products|length }} товаров</p>
+        </div>
+        
+        {% if products %}
+            <div class="row">
+                {% for product in products %}
+                    <div class="col-sm-6 col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            {% if product.photo %}
+                                <img src="{{ product.photo.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 180px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                                    <i class="fas fa-leaf fa-3x text-success"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                <p class="card-text text-success fw-bold">{{ product.price }} руб.</p>
+                                <p class="card-text small text-muted">В наличии: {{ product.stock }} шт.</p>
+                                <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-success btn-sm">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">Товаров не найдено</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

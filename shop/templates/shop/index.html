@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}PlantCare Shop - Главная{% endblock %}
+
+{% block content %}
+
+<div class="row bg-light rounded-4 p-5 mb-5" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
+    <div class="col-md-6">
+        <h1 class="display-4 text-success">PlantCare Shop</h1>
+        <p class="lead">Всё для ухода за вашими комнатными растениями</p>
+        <p>Лейки, удобрения, грунты, горшки и профессиональные средства для здоровья ваших зелёных питомцев.</p>
+        <a href="{% url 'catalog' %}" class="btn btn-success btn-lg">Перейти в каталог →</a>
+    </div>
+    <div class="col-md-6 text-center">
+        <i class="fas fa-seedling" style="font-size: 200px; color: #2e7d32;"></i>
+    </div>
+</div>
+
+
+<h2 class="mb-4">🌿 Популярные товары</h2>
+<div class="row">
+    {% for product in popular_products %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            {% if product.photo %}
+                <img src="{{ product.photo.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+            {% else %}
+                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="fas fa-leaf fa-4x text-white"></i>
+                </div>
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text text-success fw-bold">{{ product.price }} руб.</p>
+                <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-success">Подробнее</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+        <p>Товаров пока нет</p>
+    {% endfor %}
+</div>
+
+<h2 class="mb-4 mt-5">📂 Категории</h2>
+<div class="row">
+    {% for category in categories %}
+    <div class="col-md-3 col-sm-6 mb-3">
+        <a href="{% url 'catalog' %}?category={{ category.id }}" class="text-decoration-none">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-tag fa-2x text-success mb-2"></i>
+                    <h6>{{ category.name }}</h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

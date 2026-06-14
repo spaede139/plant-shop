@@ -89,7 +89,6 @@ def about_author(request):
 
 def catalog(request):
     products = Product.objects.all()
-    
     category = request.GET.get('category')
     manufacturer = request.GET.get('manufacturer')
     search = request.GET.get('search')
@@ -101,10 +100,13 @@ def catalog(request):
     if search:
         products = products.filter(Q(name__icontains=search) | Q(description__icontains=search))
     
-    return render(request, 'shop/product_list.html', {
+    return render(request, 'shop/catalog.html', {
         'products': products,
         'categories': Category.objects.all(),
         'manufacturers': Manufacturer.objects.all(),
+        'selected_category': category,
+        'selected_manufacturer': manufacturer,
+        'search_query': search,
     })
 
 def product_detail(request, pk):
@@ -269,3 +271,13 @@ class CartItemViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
 
         return CartItem.objects.filter(cart__user=self.request.user)
+    
+
+def home(request):
+    """Главная страница"""
+    popular_products = Product.objects.all().order_by('-id')[:6]  
+    categories = Category.objects.all()
+    return render(request, 'shop/index.html', {
+        'popular_products': popular_products,
+        'categories': categories,
+    })
