@@ -119,3 +119,13 @@ STATIC_URL = 'static/'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/catalog/'
 LOGOUT_REDIRECT_URL = '/catalog/'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'djangoshopt@gmail.com'
+EMAIL_HOST_PASSWORD = 'sfcm wkmy zllm dzae'  
+DEFAULT_FROM_EMAIL = 'djangoshopt@gmail.com'
+
+LOGOUT_REDIRECT_URL = '/accounts/login/'

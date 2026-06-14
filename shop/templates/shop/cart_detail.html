@@ -1,10 +1,29 @@
-> spaede:
 <!DOCTYPE html>
 <html>
 <head>
     <title>Корзина</title>
 </head>
 <body>
+
+    <div style="background-color: #f0f0f0; padding: 10px; margin-bottom: 20px;">
+        <a href="/">Главная</a> |
+        <a href="/catalog/">Каталог</a> |
+        <a href="/cart/">Корзина</a>
+        
+        <span style="float: right;">
+            {% if user.is_authenticated %}
+                {{ user.username }} | 
+                <form method="post" action="/accounts/logout/" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="background: none; border: none; color: blue; cursor: pointer; text-decoration: underline;">Сменить пользователя</button>
+                </form>
+            {% else %}
+                <a href="/accounts/login/">Войти</a> | 
+                <a href="/admin/auth/user/add/">Регистрация</a>
+            {% endif %}
+        </span>
+    </div>
+
     <h1>Корзина</h1>
 
     {% if items %}
@@ -34,6 +53,12 @@
         </table>
         
         <h3>Итого: {{ cart.total_price }} руб.</h3>
+        
+        <p>
+            <a href="/checkout/" style="display: inline-block; padding: 8px 16px; background-color: #4CAF50; color: white; text-decoration: none;">
+                Оформить заказ
+            </a>
+        </p>
     {% else %}
         <p>Корзина пуста</p>
         <a href="/catalog/">Перейти в каталог</a>

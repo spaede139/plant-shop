@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Оформление заказа</title>
+</head>
+<body>
+    <div style="background-color: #f0f0f0; padding: 10px; margin-bottom: 20px;">
+        <a href="/">Главная</a> |
+        <a href="/catalog/">Каталог</a> |
+        <a href="/cart/">Корзина</a>
+        
+        <span style="float: right;">
+            {% if user.is_authenticated %}
+                {{ user.username }} | 
+                <form method="post" action="/accounts/logout/" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="background: none; border: none; color: blue; cursor: pointer; text-decoration: underline;">Сменить пользователя</button>
+                </form>
+            {% else %}
+                <a href="/accounts/login/">Войти</a> | 
+                <a href="/admin/auth/user/add/">Регистрация</a>
+            {% endif %}
+        </span>
+    </div>
+
+    <h1>Оформление заказа</h1>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: {% if 'error' in message.tags %}red{% else %}green{% endif %};">
+                {{ message }}
+            </p>
+        {% endfor %}
+    {% endif %}
+    
+    <h2>Ваш заказ:</h2>
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Товар</th>
+            <th>Количество</th>
+            <th>Цена</th>
+            <th>Сумма</th>
+        </tr>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.product.price }} руб.</td>
+            <td>{{ item.item_price }} руб.</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="3" align="right"><strong>Итого:</strong></td>
+            <td><strong>{{ cart.total_price }} руб.</strong></td>
+        </tr>
+    </table>
+    
+    <h2>Данные для доставки:</h2>
+    <form method="post">
+        {% csrf_token %}
+        <p>
+            <label>Адрес доставки:</label><br>
+            <textarea name="address" rows="3" cols="40" required placeholder="Введите ваш адрес"></textarea>
+        </p>
+        <p>
+            <label>Телефон:</label><br>
+            <input type="text" name="phone" required placeholder="+7 (XXX) XXX-XX-XX">
+        </p>
+        <button type="submit">Подтвердить заказ</button>
+    </form>
+    
+    <p><a href="/cart/">← Вернуться в корзину</a></p>
+</body>
+</html>

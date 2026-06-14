@@ -1,14 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Вход</title>
+    <title>Вход в систему</title>
 </head>
 <body>
-    <h2>Вход в систему</h2>
+    <div style="background-color: #f0f0f0; padding: 10px; margin-bottom: 20px;">
+        <a href="/">Главная</a> |
+        <a href="/catalog/">Каталог</a> |
+        <a href="/cart/">Корзина</a>
+    </div>
+
+    <h1>Вход в систему</h1>
+    
+    {% if form.errors %}
+        <p style="color: red;">Неверное имя пользователя или пароль</p>
+    {% endif %}
     
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        <p>
+            <label>Имя пользователя:</label><br>
+            <input type="text" name="username" required>
+        </p>
+        <p>
+            <label>Пароль:</label><br>
+            <input type="password" name="password" required>
+        </p>
         <button type="submit">Войти</button>
     </form>
     
