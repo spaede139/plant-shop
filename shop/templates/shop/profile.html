@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+<div class="row">
+ 
+    <div class="col-md-3">
+        <div class="list-group">
+            <a href="#profile" class="list-group-item list-group-item-action active" data-bs-toggle="list">Профиль</a>
+            <a href="#orders" class="list-group-item list-group-item-action" data-bs-toggle="list">Мои заказы</a>
+        </div>
+    </div>
+    
+
+    <div class="col-md-9">
+        <div class="tab-content">
+          
+            <div class="tab-pane fade show active" id="profile">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0">Мой профиль</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="profile-info">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-success" role="status">
+                                    <span class="visually-hidden">Загрузка...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Вкладка Заказы -->
+            <div class="tab-pane fade" id="orders">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0">Мои заказы</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="orders-list">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-success" role="status">
+                                    <span class="visually-hidden">Загрузка...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Загрузка профиля
+async function loadProfile() {
+    try {
+        const response = await fetch('/api/me/');
+        if (response.status === 401) {
+            window.location.href = '/accounts/login/';
+            return;
+        }
+        const data = await response.json();
+        displayProfile(data);
+    } catch (error) {
+        console.error('Ошибка:', error);
+    }
+}
+
+// Отображение профиля
+function displayProfile(profile) {
+    const container = document.getElementById('profile-info');
+    const roleBadge = profile.role === 'admin' ? 'danger' : (profile.role === 'manager' ? 'warning' : 'success');
+    const roleText = profile.role === 'admin' ? 'Администратор' : (profile.role === 'manager' ? 'Менеджер' : 'Покупатель');
+    
+    container.innerHTML = `
+        <div class="row mb-3">
+            <div class="col-sm-4 fw-bold">Имя пользователя:</div>
+            <div class="col-sm-8">${profile.username}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-sm-4 fw-bold">Email:</div>
+            <div class="col-sm-8">${profile.email || 'не указан'}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-sm-4 fw-bold">Полное имя:</div>
+            <div class="col-sm-8">${profile.full_name || 'не указано'}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-sm-4 fw-bold">Телефон:</div>
+            <div class="col-sm-8">${profile.phone || 'не указан'}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-sm-4 fw-bold">Адрес:</div>
+            <div class="col-sm-8">${profile.address || 'не указан'}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-sm-4 fw-bold">Город:</div>
+            <div class="col-sm-8">${profile.city || 'не указан'}</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-sm-4 fw-bold">Роль:</div>
+            <div class="col-sm-8">
+                <span class="badge bg-${roleBadge}">${roleText}</span>
+            </div>
+        </div>
+        <button class="btn btn-success mt-3" onclick="toggleEditMode()">Редактировать профиль</button>
+    `;
+}
+
+
+let isEditMode = false;
+
+function toggleEditMode() {
+    isEditMode = !isEditMode;
+    if (isEditMode) {
+        showEditForm();
+    } else {
+        loadProfile();
+    }
+}
+
+async function showEditForm() {
+    const response = await fetch('/api/me/');
+    const profile = await response.json();
+    
+    const container = document.getElementById('profile-info');
+    container.innerHTML = `
+        <form id="edit-profile-form">
+            <div class="mb-3">
+                <label class="form-label">Полное имя</label>
+                <input type="text" name="full_name" class="form-control" value="${profile.full_name || ''}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Телефон</label>
+                <input type="text" name="phone" class="form-control" value="${profile.phone || ''}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Адрес</label>
+                <textarea name="address" class="form-control" rows="2">${profile.address || ''}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Город</label>
+                <input type="text" name="city" class="form-control" value="${profile.city || ''}">
+            </div>
+            <button type="submit" class="btn btn-success">Сохранить</button>
+            <button type="button" class="btn btn-secondary" onclick="toggleEditMode()">Отмена</button>
+        </form>
+    `;
+    
+    document.getElementById('edit-profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+        
+        const csrftoken = getCookie('csrftoken');
+        const response = await fetch('/api/me/', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+            isEditMode = false;
+            loadProfile();
+            showNotification('Профиль обновлен!', 'success');
+        } else {
+            showNotification('Ошибка обновления', 'danger');
+        }
+    });
+}
+
+function showNotification(message, type) {
+
+    alert(message);
+}
+
+
+async function loadOrders() {
+    try {
+        const response = await fetch('/api/orders/');
+        if (response.ok) {
+            const orders = await response.json();
+            displayOrders(orders);
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+    }
+}
+
+function displayOrders(orders) {
+    const container = document.getElementById('orders-list');
+    if (!orders.length) {
+        container.innerHTML = '<p class="text-muted">У вас пока нет заказов</p>';
+        return;
+    }
+    
+    let html = '<div class="table-responsive"><table class="table table-striped">';
+    html += '<thead><tr><th>№ заказа</th><th>Дата</th><th>Сумма</th><th>Статус</th></tr></thead><tbody>';
+    orders.forEach(order => {
+        html += `
+            <tr>
+                <td>${order.id}</td>
+                <td>${new Date(order.created_at).toLocaleDateString()}</td>
+                <td>${order.total_price} руб.</td>
+                <td><span class="badge bg-success">Выполнен</span></td>
+            </tr>
+        `;
+    });
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
+
+loadProfile();
+loadOrders();
+</script>
+{% endblock %}

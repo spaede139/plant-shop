@@ -35,7 +35,7 @@ function addToCartAPI(productId, quantity = 1) {
     fetch('/api/cart/add/', {
         method: 'POST',
         headers: {
-            'Content-Type': application/json',
+            'Content-Type': 'application/json',
             'X-CSRFToken': csrfToken,
         },
         body: JSON.stringify({ product_id: productId, quantity: quantity })
@@ -160,3 +160,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+async function apiRequest(url, options = {}) {
+    const csrftoken = getCookie('csrftoken');
+    
+    const defaultOptions = {
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        credentials: 'same-origin'
+    };
+    
+    const response = await fetch(url, { ...defaultOptions, ...options });
+    
+    if (response.status === 401) {
+        window.location.href = '/accounts/login/';
+        throw new Error('Необходима авторизация');
+    }
+    
+    if (response.status === 403) {
+        alert('У вас недостаточно прав для этого действия');
+        throw new Error('Доступ запрещен');
+    }
+    
+    return response;
+}

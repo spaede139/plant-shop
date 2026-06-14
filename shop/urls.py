@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from . import views
 from .views import (
     ProductViewSet, CategoryViewSet, ManufacturerViewSet,
-    CartViewSet, CartItemViewSet
+    CartViewSet, CartItemViewSet, RegisterView, LoginView, LogoutView, MeView
 )
 
 router = DefaultRouter()
@@ -24,6 +24,11 @@ urlpatterns = [
     path('cart/remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('cart/', views.cart_detail, name='cart_detail'),
     path('checkout/', views.checkout, name='checkout'),
+    path('profile/', views.profile_view, name='profile'),
     
     path('api/', include(router.urls)),
+    path('api/register/', RegisterView.as_view(), name='api-register'),
+    path('api/login/', LoginView.as_view(), name='api-login'),
+    path('api/logout/', LogoutView.as_view(), name='api-logout'),
+    path('api/me/', MeView.as_view(), name='api-me'),
 ]
