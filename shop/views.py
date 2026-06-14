@@ -146,7 +146,10 @@ def product_detail(request, pk):
 @login_required
 def profile_view(request):
     """Личный кабинет"""
-    return render(request, 'shop/profile.html')
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'shop/profile.html', {
+        'orders': orders,
+    })
 
 
 

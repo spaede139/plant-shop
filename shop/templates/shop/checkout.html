@@ -1,74 +1,82 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Оформление заказа</title>
-</head>
-<body>
-    <div style="background-color: #f0f0f0; padding: 10px; margin-bottom: 20px;">
-        <a href="/">Главная</a> |
-        <a href="/catalog/">Каталог</a> |
-        <a href="/cart/">Корзина</a>
-        
-        <span style="float: right;">
-            {% if user.is_authenticated %}
-                {{ user.username }} | 
-                <form method="post" action="/accounts/logout/" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" style="background: none; border: none; color: blue; cursor: pointer; text-decoration: underline;">Сменить пользователя</button>
-                </form>
-            {% else %}
-                <a href="/accounts/login/">Войти</a> | 
-                <a href="/admin/auth/user/add/">Регистрация</a>
-            {% endif %}
-        </span>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Оформление заказа{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Оформление заказа</h1>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{% if 'error' in message.tags %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row">
+    <!-- Колонка с заказом -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Ваш заказ</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-success">
+                            <tr>
+                                <th>Товар</th>
+                                <th>Кол-во</th>
+                                <th>Цена</th>
+                                <th>Сумма</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.product.price }} руб.</td>
+                                <td>{{ item.item_price }} руб.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-success">
+                                <td colspan="3" class="text-end fw-bold">Итого:</td>
+                                <td class="fw-bold">{{ cart.total_price }} руб.</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <h1>Оформление заказа</h1>
-    
-    {% if messages %}
-        {% for message in messages %}
-            <p style="color: {% if 'error' in message.tags %}red{% else %}green{% endif %};">
-                {{ message }}
-            </p>
-        {% endfor %}
-    {% endif %}
-    
-    <h2>Ваш заказ:</h2>
-    <table border="1" cellpadding="5">
-        <tr>
-            <th>Товар</th>
-            <th>Количество</th>
-            <th>Цена</th>
-            <th>Сумма</th>
-        </tr>
-        {% for item in items %}
-        <tr>
-            <td>{{ item.product.name }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.product.price }} руб.</td>
-            <td>{{ item.item_price }} руб.</td>
-        </tr>
-        {% endfor %}
-        <tr>
-            <td colspan="3" align="right"><strong>Итого:</strong></td>
-            <td><strong>{{ cart.total_price }} руб.</strong></td>
-        </tr>
-    </table>
-    
-    <h2>Данные для доставки:</h2>
-    <form method="post">
-        {% csrf_token %}
-        <p>
-            <label>Адрес доставки:</label><br>
-            <textarea name="address" rows="3" cols="40" required placeholder="Введите ваш адрес"></textarea>
-        </p>
-        <p>
-            <label>Телефон:</label><br>
-            <input type="text" name="phone" required placeholder="+7 (XXX) XXX-XX-XX">
-        </p>
-        <button type="submit">Подтвердить заказ</button>
-    </form>
-    
-    <p><a href="/cart/">← Вернуться в корзину</a></p>
-</body>
-</html>
+    <!-- Колонка с формой доставки -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Данные для доставки</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Адрес доставки *</label>
+                        <textarea name="address" id="address" class="form-control" rows="3" required placeholder="Введите ваш полный адрес"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Телефон *</label>
+                        <input type="tel" name="phone" id="phone" class="form-control" required placeholder="+7 (XXX) XXX-XX-XX">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Подтвердить заказ</button>
+                    <a href="{% url 'cart_detail' %}" class="btn btn-outline-secondary w-100 mt-2">← Вернуться в корзину</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

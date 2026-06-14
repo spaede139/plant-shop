@@ -5,14 +5,12 @@
 
 {% block content %}
 <div class="row">
- 
     <div class="col-md-3">
         <div class="list-group">
             <a href="#profile" class="list-group-item list-group-item-action active" data-bs-toggle="list">Профиль</a>
             <a href="#orders" class="list-group-item list-group-item-action" data-bs-toggle="list">Мои заказы</a>
         </div>
     </div>
-    
 
     <div class="col-md-9">
         <div class="tab-content">
@@ -42,11 +40,79 @@
                     </div>
                     <div class="card-body">
                         <div id="orders-list">
-                            <div class="text-center py-4">
-                                <div class="spinner-border text-success" role="status">
-                                    <span class="visually-hidden">Загрузка...</span>
-                                </div>
+                            {% if orders %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>№ заказа</th>
+                                            <th>Дата</th>
+                                            <th>Сумма</th>
+                                            <th>Адрес</th>
+                                            <th>Телефон</th>
+                                            <th>Детали</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in orders %}
+                                        <tr>
+                                            <td>#{{ order.id }}</td>
+                                            <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                                            <td>{{ order.total_price }} руб.</td>
+                                            <td>{{ order.address|truncatechars:30 }}</td>
+                                            <td>{{ order.phone }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#orderModal{{ order.id }}">
+                                                    Подробнее
+                                                </button>
+                                                
+                                                <!-- Модальное окно с деталями заказа -->
+                                                <div class="modal fade" id="orderModal{{ order.id }}" tabindex="-1">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-success text-white">
+                                                                <h5 class="modal-title">Заказ #{{ order.id }}</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+                                                                <p><strong>Сумма:</strong> {{ order.total_price }} руб.</p>
+                                                                <p><strong>Адрес:</strong> {{ order.address }}</p>
+                                                                <p><strong>Телефон:</strong> {{ order.phone }}</p>
+                                                                <hr>
+                                                                <h6>Товары:</h6>
+                                                                <table class="table table-sm">
+                                                                    <thead>
+                                                                        <tr><th>Товар</th><th>Кол-во</th><th>Цена</th></tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {% for item in order.items.all %}
+                                                                        <tr>
+                                                                            <td>{{ item.product.name }}</td>
+                                                                            <td>{{ item.quantity }}</td>
+                                                                            <td>{{ item.price }} руб.</td>
+                                                                        </tr>
+                                                                        {% endfor %}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                У вас пока нет заказов. <a href="{% url 'catalog' %}" class="alert-link">Перейти в каталог</a>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -56,7 +122,6 @@
 </div>
 
 <script>
-
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -72,7 +137,7 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Загрузка профиля
+
 async function loadProfile() {
     try {
         const response = await fetch('/api/me/');
@@ -87,7 +152,7 @@ async function loadProfile() {
     }
 }
 
-// Отображение профиля
+
 function displayProfile(profile) {
     const container = document.getElementById('profile-info');
     const roleBadge = profile.role === 'admin' ? 'danger' : (profile.role === 'manager' ? 'warning' : 'success');
@@ -127,7 +192,6 @@ function displayProfile(profile) {
         <button class="btn btn-success mt-3" onclick="toggleEditMode()">Редактировать профиль</button>
     `;
 }
-
 
 let isEditMode = false;
 
@@ -194,47 +258,10 @@ async function showEditForm() {
 }
 
 function showNotification(message, type) {
-
     alert(message);
 }
 
 
-async function loadOrders() {
-    try {
-        const response = await fetch('/api/orders/');
-        if (response.ok) {
-            const orders = await response.json();
-            displayOrders(orders);
-        }
-    } catch (error) {
-        console.error('Ошибка:', error);
-    }
-}
-
-function displayOrders(orders) {
-    const container = document.getElementById('orders-list');
-    if (!orders.length) {
-        container.innerHTML = '<p class="text-muted">У вас пока нет заказов</p>';
-        return;
-    }
-    
-    let html = '<div class="table-responsive"><table class="table table-striped">';
-    html += '<thead><tr><th>№ заказа</th><th>Дата</th><th>Сумма</th><th>Статус</th></tr></thead><tbody>';
-    orders.forEach(order => {
-        html += `
-            <tr>
-                <td>${order.id}</td>
-                <td>${new Date(order.created_at).toLocaleDateString()}</td>
-                <td>${order.total_price} руб.</td>
-                <td><span class="badge bg-success">Выполнен</span></td>
-            </tr>
-        `;
-    });
-    html += '</tbody></table></div>';
-    container.innerHTML = html;
-}
-
 loadProfile();
-loadOrders();
 </script>
 {% endblock %}
