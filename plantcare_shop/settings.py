@@ -16,8 +16,7 @@ DEBUG = config('DEBUG', default='True') == 'True'
 
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
-if not DEBUG:
-    ALLOWED_HOSTS += ['.up.railway.app', 'railway.app', '.railway.app']
+ALLOWED_HOSTS += ['.up.railway.app', 'railway.app', '.railway.app']
 
 
 
