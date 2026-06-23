@@ -4,21 +4,14 @@ Django settings for plantcare_shop project.
 import os
 import dj_database_url
 from pathlib import Path
-from decouple import config
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-@mxtw!nif6szlc7=yaz!3=itp6av5wq$l3!may3258ih7s+opk')
-DEBUG = config('DEBUG', default='True') == 'True'
-
-
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-@mxtw!nif6szlc7=yaz!3=itp6av5wq$l3!may3258ih7s+opk')
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 ALLOWED_HOSTS += ['.up.railway.app', 'railway.app', '.railway.app']
-
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -33,7 +26,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -47,7 +40,7 @@ ROOT_URLCONF = 'plantcare_shop.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -61,8 +54,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'plantcare_shop.wsgi.application'
 
-
-
 DATABASES = {
     'default': dj_database_url.config(
         default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
@@ -70,8 +61,6 @@ DATABASES = {
         conn_health_checks=True,
     )
 }
-
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -88,30 +77,23 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_TZ = True
 
-
-
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-
-
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/catalog/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
-
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -120,8 +102,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'djangoshopt@gmail.com'
 EMAIL_HOST_PASSWORD = 'sfcm wkmy zllm dzae'
 DEFAULT_FROM_EMAIL = 'djangoshopt@gmail.com'
-
-
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -132,7 +112,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
-
 
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
