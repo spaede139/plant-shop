@@ -18,7 +18,7 @@
     <div class="col-md-6">
         <div class="card">
             {% if product.photo %}
-                <img src="{{ product.photo.url }}" class="card-img-top" alt="{{ product.name }}" style="max-height: 400px; object-fit: contain;">
+                <img src="{% static 'images/' %}{{ product.photo.name|cut:'products/' }}" class="card-img-top" alt="{{ product.name }}" style="max-height: 400px; object-fit: contain;">
             {% else %}
                 <div class="card-body text-center py-5">
                     <i class="fas fa-leaf fa-5x text-success"></i>
