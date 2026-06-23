@@ -32,7 +32,7 @@
                         <select name="manufacturer" class="form-select">
                             <option value="">Все производители</option>
                             {% for man in manufacturers %}
-                                <option value="{{ man.id }}" {% if selected_manufacturer == man.id|stringformat:"s" }}selected{% endif %}>
+                                <option value="{{ man.id }}" {% if selected_manufacturer == man.id|stringformat:"s" %}selected{% endif %}>
                                     {{ man.name }}
                                 </option>
                             {% endfor %}
